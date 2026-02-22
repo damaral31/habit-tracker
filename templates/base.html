@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Healthy Habit Tracker{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <nav class="bg-gray-800 border-b border-gray-700 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-green-400">🏃 Healthy Habit Tracker</h1>
+                </div>
+                {% if current_user.is_authenticated %}
+                <div class="flex items-center space-x-1">
+                    <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}bg-gray-700 text-green-400{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">📊 Dashboard</a>
+                    <a href="{{ url_for('alimentacao') }}" class="{% if request.endpoint == 'alimentacao' %}bg-gray-700 text-green-400{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">🍽️ Alimentação</a>
+                    <a href="{{ url_for('treino') }}" class="{% if request.endpoint == 'treino' %}bg-gray-700 text-green-400{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">💪 Treino</a>
+                    <a href="{{ url_for('vida') }}" class="{% if request.endpoint == 'vida' %}bg-gray-700 text-green-400{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">📚 Vida</a>
+                    <a href="{{ url_for('perfil') }}" class="{% if request.endpoint == 'perfil' %}bg-gray-700 text-green-400{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">👤 Perfil</a>
+                    <span class="mx-4 border-l border-gray-600 h-6"></span>
+                    <span class="text-gray-300 text-sm mr-4">{{ current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Logout</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-lg {% if category == 'success' %}bg-green-900/50 text-green-400 border border-green-800{% else %}bg-red-900/50 text-red-400 border border-red-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Vida - Healthy Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Resumo de Hoje -->
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+        <h2 class="text-2xl font-bold text-gray-200 mb-4"> Hábitos de Vida - Hoje</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-indigo-900/30 p-4 rounded-lg border border-indigo-800">
+                <p class="text-gray-400">Páginas Lidas</p>
+                <p class="text-3xl font-bold text-indigo-400">{{ log_today.reading_pages }}</p>
+            </div>
+            <div class="bg-red-900/30 p-4 rounded-lg border border-red-800">
+                <p class="text-gray-400">Peso</p>
+                <p class="text-3xl font-bold text-red-400">{{ "%.1f" | format(log_today.weight) }} kg</p>
+            </div>
+            <div class="bg-purple-900/30 p-4 rounded-lg border border-purple-800">
+                <p class="text-gray-400">Horas de Sono</p>
+                <p class="text-3xl font-bold text-purple-400">{{ "%.1f" | format(log_today.sleep_hours) }} h</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registar Hábitos -->
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+        <h3 class="text-xl font-bold text-gray-200 mb-4"> Registar Hábitos de Hoje</h3>
+        <form method="POST" class="space-y-6">
+            <div>
+                <label for="pages" class="block text-sm font-medium text-gray-400"> Páginas Lidas Hoje</label>
+                <input type="number" id="pages" name="pages" value="{{ log_today.reading_pages }}" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 30">
+            </div>
+
+            <div>
+                <label for="weight" class="block text-sm font-medium text-gray-400"> Peso (kg)</label>
+                <input type="number" id="weight" name="weight" step="0.1" value="{% if log_today.weight > 0 %}{{ log_today.weight }}{% endif %}" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 75.5">
+            </div>
+
+            <div>
+                <label for="sleep_hours" class="block text-sm font-medium text-gray-400"> Horas de Sono</label>
+                <input type="number" id="sleep_hours" name="sleep_hours" step="0.1" value="{% if log_today.sleep_hours > 0 %}{{ log_today.sleep_hours }}{% endif %}" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 8.0">
+            </div>
+
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">Guardar</button>
+        </form>
+    </div>
+
+    <!-- Dicas de Bem-estar -->
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+        <h3 class="text-xl font-bold text-gray-200 mb-4"> Dicas de Bem-estar</h3>
+        <ul class="space-y-3 text-gray-400">
+            <li> <strong class="text-gray-300">Leitura:</strong> Leia pelo menos 20-30 páginas por dia para melhorar a concentração e reduzir o stress.</li>
+            <li> <strong class="text-gray-300">Peso:</strong> Registe o seu peso no mesmo horário todos os dias para obter leituras mais precisas.</li>
+            <li> <strong class="text-gray-300">Meditação:</strong> Reserve 10 minutos por dia para meditação ou respiração consciente.</li>
+            <li> <strong class="text-gray-300">Sono:</strong> Durma 7-9 horas por noite para uma recuperação adequada.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

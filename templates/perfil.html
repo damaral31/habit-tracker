@@ -1,0 +1,116 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Perfil - Healthy Habit Tracker{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Informações do Utilizador -->
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+        <h2 class="text-2xl font-bold text-gray-200 mb-4"> Meu Perfil</h2>
+        <p class="text-lg text-gray-400">Utilizador: <strong class="text-white">{{ current_user.username }}</strong></p>
+    </div>
+
+    <!-- Definir Metas -->
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+        <h3 class="text-xl font-bold text-gray-200 mb-6"> Minhas Metas Diárias</h3>
+        <form method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Meta de Calorias -->
+                <div>
+                    <label for="goal_calories" class="block text-sm font-medium text-gray-400"> Meta de Calorias (kcal/dia)</label>
+                    <input type="number" id="goal_calories" name="goal_calories" value="{{ current_user.goal_calories }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 2000">
+                    <p class="text-sm text-gray-500 mt-1">Recomendação: 1800-2500 kcal</p>
+                </div>
+
+                <!-- Meta de Água -->
+                <div>
+                    <label for="goal_water" class="block text-sm font-medium text-gray-400"> Meta de Água (litros/dia)</label>
+                    <input type="number" id="goal_water" name="goal_water" step="0.1" value="{{ current_user.goal_water }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 2.0">
+                    <p class="text-sm text-gray-500 mt-1">Recomendação: 2.0-3.0 litros</p>
+                </div>
+
+                <!-- Meta de Peso -->
+                <div>
+                    <label for="goal_weight" class="block text-sm font-medium text-gray-400"> Peso Alvo (kg)</label>
+                    <input type="number" id="goal_weight" name="goal_weight" step="0.1" value="{{ current_user.goal_weight }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 70.0">
+                    <p class="text-sm text-gray-500 mt-1">Defina o seu peso ideal</p>
+                </div>
+
+                <!-- Meta de Tempo de Treino -->
+                <div>
+                    <label for="goal_workout_time" class="block text-sm font-medium text-gray-400"> Tempo de Treino (minutos/dia)</label>
+                    <input type="number" id="goal_workout_time" name="goal_workout_time" value="{{ current_user.goal_workout_time }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 30">
+                    <p class="text-sm text-gray-500 mt-1">Recomendação: 30-60 minutos</p>
+                </div>
+                <!-- Meta de Sono -->
+                <div>
+                    <label for="goal_sleep_hours" class="block text-sm font-medium text-gray-400">😴 Horas de Sono (horas/noite)</label>
+                    <input type="number" id="goal_sleep_hours" name="goal_sleep_hours" step="0.1" value="{{ current_user.goal_sleep_hours }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 8.0">
+                    <p class="text-sm text-gray-500 mt-1">Recomendação: 7-9 horas</p>
+                </div>
+
+                <!-- Meta de Leitura -->
+                <div>
+                    <label for="goal_reading_pages" class="block text-sm font-medium text-gray-400">📚 Páginas Lidas (páginas/dia)</label>
+                    <input type="number" id="goal_reading_pages" name="goal_reading_pages" value="{{ current_user.goal_reading_pages }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 20">
+                    <p class="text-sm text-gray-500 mt-1">Recomendação: 10-30 páginas</p>
+                </div>            </div>
+
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors">
+                Guardar Metas
+            </button>
+        </form>
+    </div>
+
+    <!-- Recomendações de Saúde -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Nutrição -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h4 class="text-lg font-bold text-blue-400 mb-3"> Dicas de Nutrição</h4>
+            <ul class="space-y-2 text-gray-400 text-sm">
+                <li> Consuma proteína em cada refeição</li>
+                <li> Beba água regularmente ao longo do dia</li>
+                <li> Evite alimentos ultraprocessados</li>
+                <li> Coma devagar e mastigue bem</li>
+                <li> Faça 3 refeições principais + 1-2 lanches</li>
+            </ul>
+        </div>
+
+        <!-- Exercício -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h4 class="text-lg font-bold text-green-400 mb-3"> Dicas de Exercício</h4>
+            <ul class="space-y-2 text-gray-400 text-sm">
+                <li> Combine cardio com treino de força</li>
+                <li> Faça aquecimento antes de treinar</li>
+                <li> Descanse 1-2 dias por semana</li>
+                <li> Aumente a intensidade gradualmente</li>
+                <li> Mantenha a consistência</li>
+            </ul>
+        </div>
+
+        <!-- Sono -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h4 class="text-lg font-bold text-purple-400 mb-3"> Dicas de Sono</h4>
+            <ul class="space-y-2 text-gray-400 text-sm">
+                <li> Durma 7-9 horas por noite</li>
+                <li> Mantenha um horário regular</li>
+                <li> Evite ecrãs 1 hora antes de dormir</li>
+                <li> Mantenha o quarto fresco e escuro</li>
+                <li> Evite cafeína após as 15h</li>
+            </ul>
+        </div>
+
+        <!-- Bem-estar Mental -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h4 class="text-lg font-bold text-pink-400 mb-3"> Bem-estar Mental</h4>
+            <ul class="space-y-2 text-gray-400 text-sm">
+                <li> Pratique meditação diariamente</li>
+                <li> Passe tempo ao ar livre</li>
+                <li> Mantenha contacto social</li>
+                <li> Leia regularmente</li>
+                <li> Gerencie o stress com técnicas de relaxamento</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

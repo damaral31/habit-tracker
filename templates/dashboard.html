@@ -1,117 +1,281 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Dashboard - Healthy Habit Tracker{% endblock %}
 
 {% block content %}
 <div class="space-y-8">
     <!-- Filtros Temporais -->
-    <div class="flex flex-col sm:flex-row justify-between items-center bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700 gap-4">
-        <h2 class="text-xl font-bold text-white">Visão Geral</h2>
+    <div class="flex flex-col sm:flex-row justify-between items-center bg-gradient-to-r from-gray-800 to-gray-900 p-6 rounded-xl shadow-xl border border-gray-700 gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-white">📊 Dashboard</h2>
+            <p class="text-gray-400 text-sm mt-1">Período: últimos {{ filter_days }} dias</p>
+        </div>
         <div class="flex flex-wrap justify-center gap-2">
-            <a href="{{ url_for('dashboard', days=7) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if filter_days == 7 %}bg-green-600 text-white{% else %}bg-gray-700 text-gray-300 hover:bg-gray-600{% endif %}">7 Dias</a>
-            <a href="{{ url_for('dashboard', days=15) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if filter_days == 15 %}bg-green-600 text-white{% else %}bg-gray-700 text-gray-300 hover:bg-gray-600{% endif %}">15 Dias</a>
-            <a href="{{ url_for('dashboard', days=30) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if filter_days == 30 %}bg-green-600 text-white{% else %}bg-gray-700 text-gray-300 hover:bg-gray-600{% endif %}">30 Dias</a>
+            <a href="{{ url_for('dashboard', days=7) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all {% if filter_days == 7 %}bg-green-600 text-white shadow-lg scale-105{% else %}bg-gray-700 text-gray-300 hover:bg-gray-600{% endif %}">7 Dias</a>
+            <a href="{{ url_for('dashboard', days=15) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all {% if filter_days == 15 %}bg-green-600 text-white shadow-lg scale-105{% else %}bg-gray-700 text-gray-300 hover:bg-gray-600{% endif %}">15 Dias</a>
+            <a href="{{ url_for('dashboard', days=30) }}" class="px-4 py-2 rounded-lg text-sm font-medium transition-all {% if filter_days == 30 %}bg-green-600 text-white shadow-lg scale-105{% else %}bg-gray-700 text-gray-300 hover:bg-gray-600{% endif %}">30 Dias</a>
         </div>
     </div>
 
-    <!-- Insights -->
-    {% if insights %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {% for insight in insights %}
-        <div class="bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-3">
-            <div class="text-green-400 text-xl"></div>
-            <p class="text-gray-300 text-sm">{{ insight }}</p>
+    <!-- Streak & Main Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Streak Card -->
+        <div class="bg-gradient-to-br from-green-600 via-green-700 to-green-900 text-white p-8 rounded-xl shadow-2xl border border-green-500/30">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-4xl font-bold mb-2">{{ streak }}</h2>
+                    <p class="text-green-100 text-lg">Days Streak 🔥</p>
+                    <p class="text-green-200 text-xs mt-3">Manter a consistência!</p>
+                </div>
+                <div class="text-6xl opacity-20">🎯</div>
+            </div>
         </div>
-        {% endfor %}
+
+        <!-- Overall Achievement Rate -->
+        <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white p-8 rounded-xl shadow-2xl border border-blue-500/30">
+            {% set avg_achievement = ((achievement_rates.calories + achievement_rates.water + achievement_rates.workout + achievement_rates.sleep + achievement_rates.reading) / 5) %}
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-4xl font-bold mb-2">{{ "%.0f" | format(avg_achievement) }}%</h2>
+                    <p class="text-blue-100 text-lg">Overall Achievement</p>
+                    <p class="text-blue-200 text-xs mt-3">Média de objetivos cumpridos</p>
+                </div>
+                <div class="text-6xl opacity-20">⭐</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Smart Insights -->
+    {% if insights %}
+    <div class="bg-gradient-to-r from-amber-900/30 via-orange-900/30 to-red-900/30 border border-amber-600/40 rounded-xl p-6 shadow-lg">
+        <h3 class="text-lg font-bold text-amber-300 mb-4">✨ Insights da Semana</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {% for insight in insights %}
+            <div class="bg-gray-800/80 p-4 rounded-lg border border-amber-600/20 flex items-start space-x-3 hover:bg-gray-800/90 transition">
+                <span class="text-amber-400 text-xl mt-1">💡</span>
+                <p class="text-gray-200 text-sm leading-relaxed">{{ insight }}</p>
+            </div>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 
-    <!-- Header com Streak -->
-    <div class="bg-gradient-to-r from-green-600 to-green-800 text-white p-6 rounded-xl shadow-lg border border-green-700">
-        <h2 class="text-2xl font-bold"> Sequência Atual</h2>
-        <p class="text-4xl font-bold mt-2">{{ streak }} dias</p>
+    <!-- Achievement Rates -->
+    <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold text-gray-100 mb-6">📈 Taxa de Cumprimento de Objetivos</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <!-- Calories -->
+            <div class="bg-gray-900 p-4 rounded-lg border border-blue-600/30">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-300 text-sm font-medium">Calorias</span>
+                    <span class="text-blue-400 font-bold text-lg">{{ "%.0f" | format(achievement_rates.calories) }}%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: {{ achievement_rates.calories }}%"></div>
+                </div>
+            </div>
+
+            <!-- Water -->
+            <div class="bg-gray-900 p-4 rounded-lg border border-cyan-600/30">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-300 text-sm font-medium">Água</span>
+                    <span class="text-cyan-400 font-bold text-lg">{{ "%.0f" | format(achievement_rates.water) }}%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-cyan-500 h-2 rounded-full transition-all" style="width: {{ achievement_rates.water }}%"></div>
+                </div>
+            </div>
+
+            <!-- Workout -->
+            <div class="bg-gray-900 p-4 rounded-lg border border-green-600/30">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-300 text-sm font-medium">Treino</span>
+                    <span class="text-green-400 font-bold text-lg">{{ "%.0f" | format(achievement_rates.workout) }}%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full transition-all" style="width: {{ achievement_rates.workout }}%"></div>
+                </div>
+            </div>
+
+            <!-- Sleep -->
+            <div class="bg-gray-900 p-4 rounded-lg border border-purple-600/30">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-300 text-sm font-medium">Sono</span>
+                    <span class="text-purple-400 font-bold text-lg">{{ "%.0f" | format(achievement_rates.sleep) }}%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-purple-500 h-2 rounded-full transition-all" style="width: {{ achievement_rates.sleep }}%"></div>
+                </div>
+            </div>
+
+            <!-- Reading -->
+            <div class="bg-gray-900 p-4 rounded-lg border border-indigo-600/30">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-300 text-sm font-medium">Leitura</span>
+                    <span class="text-indigo-400 font-bold text-lg">{{ "%.0f" | format(achievement_rates.reading) }}%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-indigo-500 h-2 rounded-full transition-all" style="width: {{ achievement_rates.reading }}%"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Progresso face às Metas -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Meta de Calorias -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-lg font-bold text-gray-300"> Calorias (Hoje)</h3>
-            <p class="text-2xl font-bold text-blue-400 mt-2">{{ calories[-1] if calories else 0 }} / {{ current_user.goal_calories }}</p>
-            <div class="w-full bg-gray-700 rounded-full h-2 mt-4">
-                <div class="bg-blue-500 h-2 rounded-full" style="width: {% if current_user.goal_calories > 0 %}{{ [((calories[-1] / current_user.goal_calories * 100) if calories else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+    <!-- Today's Progress -->
+    <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold text-gray-100 mb-6">🎯 Progresso de Hoje</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Calorias -->
+            <div class="bg-gradient-to-br from-blue-900/40 to-blue-800/20 p-6 rounded-lg border border-blue-600/30 hover:from-blue-900/50 hover:to-blue-800/30 transition">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-gray-300 font-semibold">🔥 Calorias</h4>
+                    <span class="text-blue-400 text-2xl font-bold">{{ calories[-1] if calories else 0 }}</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-3">Meta: {{ current_user.goal_calories }} cal</p>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-blue-500 h-2 rounded-full" style="width: {% if current_user.goal_calories > 0 %}{{ [((calories[-1] / current_user.goal_calories * 100) if calories else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Meta de Água -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-lg font-bold text-gray-300"> Água (Hoje)</h3>
-            <p class="text-2xl font-bold text-cyan-400 mt-2">{{ "%.1f" | format(water[-1] if water else 0) }} / {{ current_user.goal_water }}L</p>
-            <div class="w-full bg-gray-700 rounded-full h-2 mt-4">
-                <div class="bg-cyan-500 h-2 rounded-full" style="width: {% if current_user.goal_water > 0 %}{{ [((water[-1] / current_user.goal_water * 100) if water else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+            <!-- Água -->
+            <div class="bg-gradient-to-br from-cyan-900/40 to-cyan-800/20 p-6 rounded-lg border border-cyan-600/30 hover:from-cyan-900/50 hover:to-cyan-800/30 transition">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-gray-300 font-semibold">💧 Água</h4>
+                    <span class="text-cyan-400 text-2xl font-bold">{{ "%.1f" | format(water[-1] if water else 0) }}L</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-3">Meta: {{ current_user.goal_water }}L</p>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-cyan-500 h-2 rounded-full" style="width: {% if current_user.goal_water > 0 %}{{ [((water[-1] / current_user.goal_water * 100) if water else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Meta de Peso -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-lg font-bold text-gray-300"> Peso Atual</h3>
-            <p class="text-2xl font-bold text-red-400 mt-2">{{ "%.1f" | format(weight[-1] if weight else 0) }} kg</p>
-            <p class="text-sm text-gray-400 mt-2">Meta: {{ current_user.goal_weight }} kg</p>
-        </div>
-
-        <!-- Treino -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-lg font-bold text-gray-300"> Treino (Hoje)</h3>
-            <p class="text-2xl font-bold text-green-400 mt-2">{{ workout[-1] if workout else 0 }} / {{ current_user.goal_workout_time }} min</p>
-            <div class="w-full bg-gray-700 rounded-full h-2 mt-4">
-                <div class="bg-green-500 h-2 rounded-full" style="width: {% if current_user.goal_workout_time > 0 %}{{ [((workout[-1] / current_user.goal_workout_time * 100) if workout else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+            <!-- Treino -->
+            <div class="bg-gradient-to-br from-green-900/40 to-green-800/20 p-6 rounded-lg border border-green-600/30 hover:from-green-900/50 hover:to-green-800/30 transition">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-gray-300 font-semibold">💪 Treino</h4>
+                    <span class="text-green-400 text-2xl font-bold">{{ workout[-1] if workout else 0 }}m</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-3">Meta: {{ current_user.goal_workout_time }} min</p>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: {% if current_user.goal_workout_time > 0 %}{{ [((workout[-1] / current_user.goal_workout_time * 100) if workout else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Sono -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-lg font-bold text-gray-300"> Sono (Hoje)</h3>
-            <p class="text-2xl font-bold text-purple-400 mt-2">{{ "%.1f" | format(sleep[-1] if sleep else 0) }} / {{ current_user.goal_sleep_hours }} h</p>
-            <div class="w-full bg-gray-700 rounded-full h-2 mt-4">
-                <div class="bg-purple-500 h-2 rounded-full" style="width: {% if current_user.goal_sleep_hours > 0 %}{{ [((sleep[-1] / current_user.goal_sleep_hours * 100) if sleep else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+            <!-- Sono -->
+            <div class="bg-gradient-to-br from-purple-900/40 to-purple-800/20 p-6 rounded-lg border border-purple-600/30 hover:from-purple-900/50 hover:to-purple-800/30 transition">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-gray-300 font-semibold">😴 Sono</h4>
+                    <span class="text-purple-400 text-2xl font-bold">{{ "%.1f" | format(sleep[-1] if sleep else 0) }}h</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-3">Meta: {{ current_user.goal_sleep_hours }}h</p>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-purple-500 h-2 rounded-full" style="width: {% if current_user.goal_sleep_hours > 0 %}{{ [((sleep[-1] / current_user.goal_sleep_hours * 100) if sleep else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Leitura -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-lg font-bold text-gray-300"> Leitura (Hoje)</h3>
-            <p class="text-2xl font-bold text-indigo-400 mt-2">{{ reading[-1] if reading else 0 }} / {{ current_user.goal_reading_pages }} pág</p>
-            <div class="w-full bg-gray-700 rounded-full h-2 mt-4">
-                <div class="bg-indigo-500 h-2 rounded-full" style="width: {% if current_user.goal_reading_pages > 0 %}{{ [((reading[-1] / current_user.goal_reading_pages * 100) if reading else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+            <!-- Leitura -->
+            <div class="bg-gradient-to-br from-indigo-900/40 to-indigo-800/20 p-6 rounded-lg border border-indigo-600/30 hover:from-indigo-900/50 hover:to-indigo-800/30 transition">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-gray-300 font-semibold">📚 Leitura</h4>
+                    <span class="text-indigo-400 text-2xl font-bold">{{ reading[-1] if reading else 0 }}</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-3">Meta: {{ current_user.goal_reading_pages }} pág</p>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div class="bg-indigo-500 h-2 rounded-full" style="width: {% if current_user.goal_reading_pages > 0 %}{{ [((reading[-1] / current_user.goal_reading_pages * 100) if reading else 0), 100]|min }}{% else %}0{% endif %}%"></div>
+                </div>
+            </div>
+
+            <!-- Peso -->
+            <div class="bg-gradient-to-br from-red-900/40 to-red-800/20 p-6 rounded-lg border border-red-600/30 hover:from-red-900/50 hover:to-red-800/30 transition">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="text-gray-300 font-semibold">⚖️ Peso</h4>
+                    <span class="text-red-400 text-2xl font-bold">{{ "%.1f" | format(weight[-1] if weight else 0) }}kg</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-3">Meta: {{ current_user.goal_weight }}kg</p>
             </div>
         </div>
     </div>
 
-    <!-- Gráficos -->
+    <!-- Best Performance & Stats -->
+    {% if best_metrics %}
+    <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold text-gray-100 mb-6">🏆 Melhores Performances</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {% if best_metrics.calories %}
+            <div class="bg-blue-900/30 p-4 rounded-lg border border-blue-600/30 text-center">
+                <p class="text-gray-400 text-sm">Máx. Calorias</p>
+                <p class="text-blue-400 text-2xl font-bold mt-2">{{ best_metrics.calories }}</p>
+            </div>
+            {% endif %}
+
+            {% if best_metrics.water %}
+            <div class="bg-cyan-900/30 p-4 rounded-lg border border-cyan-600/30 text-center">
+                <p class="text-gray-400 text-sm">Máx. Água</p>
+                <p class="text-cyan-400 text-2xl font-bold mt-2">{{ "%.1f" | format(best_metrics.water) }}L</p>
+            </div>
+            {% endif %}
+
+            {% if best_metrics.workout %}
+            <div class="bg-green-900/30 p-4 rounded-lg border border-green-600/30 text-center">
+                <p class="text-gray-400 text-sm">Máx. Treino</p>
+                <p class="text-green-400 text-2xl font-bold mt-2">{{ best_metrics.workout }}m</p>
+            </div>
+            {% endif %}
+
+            {% if best_metrics.sleep %}
+            <div class="bg-purple-900/30 p-4 rounded-lg border border-purple-600/30 text-center">
+                <p class="text-gray-400 text-sm">Máx. Sono</p>
+                <p class="text-purple-400 text-2xl font-bold mt-2">{{ "%.1f" | format(best_metrics.sleep) }}h</p>
+            </div>
+            {% endif %}
+
+            {% if best_metrics.reading %}
+            <div class="bg-indigo-900/30 p-4 rounded-lg border border-indigo-600/30 text-center">
+                <p class="text-gray-400 text-sm">Máx. Leitura</p>
+                <p class="text-indigo-400 text-2xl font-bold mt-2">{{ best_metrics.reading }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Charts Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Gráfico de Calorias vs Meta (Bar Chart) -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-xl font-bold text-gray-200 mb-4"> Consumo Calórico vs. Meta</h3>
+        <!-- Gráfico de Calorias -->
+        <div class="bg-gray-800/50 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h3 class="text-lg font-bold text-gray-200 mb-4">📊 Consumo Calórico vs. Meta</h3>
             <canvas id="caloriesChart"></canvas>
         </div>
 
-        <!-- Evolução de Peso e Sono (Mixed Line/Bar Chart) -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-xl font-bold text-gray-200 mb-4"> Evolução de Peso e Sono</h3>
-            <canvas id="weightSleepChart"></canvas>
+        <!-- Gráfico de Treino -->
+        <div class="bg-gray-800/50 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h3 class="text-lg font-bold text-gray-200 mb-4">💪 Duração do Treino</h3>
+            <canvas id="workoutChart"></canvas>
         </div>
 
-        <!-- Macronutrientes (Doughnut Chart) -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-xl font-bold text-gray-200 mb-4"> Distribuição de Macronutrientes</h3>
+        <!-- Gráfico de Peso e Sono -->
+        <div class="bg-gray-800/50 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h3 class="text-lg font-bold text-gray-200 mb-4">⚖️ Evolução de Peso</h3>
+            <canvas id="weightChart"></canvas>
+        </div>
+
+        <!-- Gráfico de Sono -->
+        <div class="bg-gray-800/50 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h3 class="text-lg font-bold text-gray-200 mb-4">😴 Horas de Sono</h3>
+            <canvas id="sleepChart"></canvas>
+        </div>
+
+        <!-- Macronutrientes -->
+        <div class="bg-gray-800/50 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h3 class="text-lg font-bold text-gray-200 mb-4">🍗 Macronutrientes</h3>
             <div class="relative h-64 w-full flex justify-center">
                 <canvas id="macrosChart"></canvas>
             </div>
         </div>
-        
-        <!-- Água (Line Chart) -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 class="text-xl font-bold text-gray-200 mb-4"> Consumo de Água</h3>
+
+        <!-- Água e Leitura -->
+        <div class="bg-gray-800/50 p-6 rounded-xl shadow-lg border border-gray-700">
+            <h3 class="text-lg font-bold text-gray-200 mb-4">💧 Consumo de Água</h3>
             <canvas id="waterChart"></canvas>
         </div>
     </div>
@@ -127,8 +291,13 @@
     const water = {{ water | tojson }};
     const weight = {{ weight | tojson }};
     const sleep = {{ sleep | tojson }};
+    const workout = {{ workout | tojson }};
+    const reading = {{ reading | tojson }};
     const goalCalories = {{ current_user.goal_calories }};
-    
+    const goalWater = {{ current_user.goal_water }};
+    const goalWorkout = {{ current_user.goal_workout_time }};
+    const goalSleep = {{ current_user.goal_sleep_hours }};
+
     const totalProtein = {{ total_protein }};
     const totalCarbs = {{ total_carbs }};
     const totalFats = {{ total_fats }};
@@ -143,7 +312,7 @@
                 {
                     label: 'Calorias Consumidas',
                     data: calories,
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
                     borderColor: '#3B82F6',
                     borderWidth: 1,
                     borderRadius: 4
@@ -155,22 +324,64 @@
                     borderColor: '#EF4444',
                     borderDash: [5, 5],
                     backgroundColor: 'transparent',
-                    tension: 0.4,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true, labels: { usePointStyle: true } }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }
+            }
+        }
+    });
+
+    // 2. Gráfico de Treino
+    const workoutCtx = document.getElementById('workoutChart').getContext('2d');
+    new Chart(workoutCtx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Minutos de Treino',
+                    data: workout,
+                    backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                    borderColor: '#22C55E',
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Meta',
+                    data: Array(dates.length).fill(goalWorkout),
+                    type: 'line',
+                    borderColor: '#F59E0B',
+                    borderDash: [5, 5],
+                    backgroundColor: 'transparent',
+                    tension: 0.3,
                     pointRadius: 0
                 }
             ]
         },
         options: {
             responsive: true,
+            plugins: {
+                legend: { display: true, labels: { usePointStyle: true } }
+            },
             scales: {
-                y: { beginAtZero: true }
+                y: { beginAtZero: true, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }
             }
         }
     });
 
-    // 2. Gráfico de Peso e Sono (Mixed Chart)
-    const weightSleepCtx = document.getElementById('weightSleepChart').getContext('2d');
-    new Chart(weightSleepCtx, {
+    // 3. Gráfico de Peso
+    const weightCtx = document.getElementById('weightChart').getContext('2d');
+    new Chart(weightCtx, {
         type: 'line',
         data: {
             labels: dates,
@@ -179,44 +390,65 @@
                     label: 'Peso (kg)',
                     data: weight,
                     borderColor: '#F87171',
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                    fill: true,
                     tension: 0.4,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Horas de Sono',
-                    data: sleep,
-                    type: 'bar',
-                    backgroundColor: 'rgba(167, 139, 250, 0.6)',
-                    borderColor: '#A78BFA',
-                    borderWidth: 1,
-                    borderRadius: 4,
-                    yAxisID: 'y1'
+                    pointBackgroundColor: '#F87171',
+                    pointBorderColor: '#DC2626',
+                    pointRadius: 4
                 }
             ]
         },
         options: {
             responsive: true,
+            plugins: {
+                legend: { display: true, labels: { usePointStyle: true } }
+            },
             scales: {
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: { display: true, text: 'Peso (kg)' }
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    grid: { drawOnChartArea: false },
-                    title: { display: true, text: 'Horas de Sono' },
-                    beginAtZero: true
-                }
+                y: { beginAtZero: false, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }
             }
         }
     });
 
-    // 3. Gráfico de Macronutrientes (Doughnut Chart)
+    // 4. Gráfico de Sono
+    const sleepCtx = document.getElementById('sleepChart').getContext('2d');
+    new Chart(sleepCtx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Horas de Sono',
+                    data: sleep,
+                    backgroundColor: 'rgba(167, 139, 250, 0.7)',
+                    borderColor: '#A78BFA',
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Meta',
+                    data: Array(dates.length).fill(goalSleep),
+                    type: 'line',
+                    borderColor: '#06B6D4',
+                    borderDash: [5, 5],
+                    backgroundColor: 'transparent',
+                    tension: 0.3,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true, labels: { usePointStyle: true } }
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }
+            }
+        }
+    });
+
+    // 5. Gráfico de Macronutrientes
     const macrosCtx = document.getElementById('macrosChart').getContext('2d');
     new Chart(macrosCtx, {
         type: 'doughnut',
@@ -227,7 +459,7 @@
                 backgroundColor: [
                     'rgba(239, 68, 68, 0.8)',  // Red for Protein
                     'rgba(59, 130, 246, 0.8)', // Blue for Carbs
-                    'rgba(245, 158, 11, 0.8)'  // Yellow for Fats
+                    'rgba(245, 158, 11, 0.8)'  // Amber for Fats
                 ],
                 borderColor: '#1F2937',
                 borderWidth: 2
@@ -237,12 +469,12 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } }
             }
         }
     });
 
-    // 4. Gráfico de Água (Line Chart)
+    // 6. Gráfico de Água
     const waterCtx = document.getElementById('waterChart').getContext('2d');
     new Chart(waterCtx, {
         type: 'line',
@@ -254,13 +486,19 @@
                 borderColor: '#06B6D4',
                 backgroundColor: 'rgba(6, 182, 212, 0.1)',
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointBackgroundColor: '#06B6D4',
+                pointBorderColor: '#0891B2',
+                pointRadius: 4
             }]
         },
         options: {
             responsive: true,
+            plugins: {
+                legend: { display: true, labels: { usePointStyle: true } }
+            },
             scales: {
-                y: { beginAtZero: true }
+                y: { beginAtZero: true, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }
             }
         }
     });

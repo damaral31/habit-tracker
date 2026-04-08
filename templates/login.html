@@ -1,31 +1,87 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Login - Healthy Habit Tracker{% endblock %}
 
 {% block content %}
 <div class="flex justify-center items-center min-h-[80vh]">
-    <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 w-full max-w-md">
-        <h2 class="text-3xl font-bold text-center text-green-400 mb-6">Login</h2>
-        
-        <form method="POST" class="space-y-4">
-            <div>
-                <label for="username" class="block text-sm font-medium text-gray-400">Utilizador</label>
-                <input type="text" id="username" name="username" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+    <div class="w-full max-w-md">
+        <!-- Decoração superior -->
+        <div class="text-center mb-8">
+            <div class="inline-block">
+                <div class="text-6xl mb-4 animate-bounce">🏃‍♂️</div>
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-green-400 via-blue-400 to-green-400 bg-clip-text text-transparent mb-2">
+                    Healthy Habit Tracker
+                </h1>
+                <p class="text-gray-400 text-sm">Acompanhe seus hábitos saudáveis</p>
             </div>
-            
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-400">Password</label>
-                <input type="password" id="password" name="password" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
+
+        <!-- Card de Login -->
+        <div class="bg-gradient-to-br from-gray-800/90 to-gray-900/90 p-8 rounded-2xl shadow-2xl border border-gray-700/50 hover:border-green-600/50 transition-all">
+            <h2 class="text-2xl font-bold text-center text-white mb-2">Login</h2>
+            <p class="text-center text-gray-400 text-sm mb-8">Entre com suas credenciais</p>
+
+            <form method="POST" class="space-y-5">
+                <!-- Utilizador -->
+                <div>
+                    <label for="username" class="block text-sm font-semibold text-gray-300 mb-2">👤 Utilizador</label>
+                    <div class="relative">
+                        <input type="text" id="username" name="username" required class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="Digite seu utilizador">
+                        <span class="absolute right-4 top-3 text-gray-500">👤</span>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-semibold text-gray-300 mb-2">🔒 Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" placeholder="Digite sua password">
+                        <span class="absolute right-4 top-3 text-gray-500">🔒</span>
+                    </div>
+                </div>
+
+                <!-- Botão de Login -->
+                <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105 shadow-lg mt-6">
+                    🚀 Entrar
+                </button>
+            </form>
+
+            <!-- Info -->
+            <div class="mt-8 pt-6 border-t border-gray-700">
+                <p class="text-center text-gray-400 text-sm leading-relaxed">
+                    <span class="text-gray-500">ℹ️</span> Contacte o administrador
+                    <br>
+                    <span class="text-gray-300 font-semibold">para criar uma conta</span>
+                </p>
             </div>
-            
-            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                Entrar
-            </button>
-        </form>
-        
-        <p class="text-center text-gray-500 mt-4 text-sm">
-            Contacte o administrador para criar uma conta.
-        </p>
+        </div>
+
+        <!-- Benefícios -->
+        <div class="mt-8 grid grid-cols-3 gap-4">
+            <div class="text-center">
+                <div class="text-3xl mb-2">📊</div>
+                <p class="text-xs text-gray-400">Dashboard</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl mb-2">🎯</div>
+                <p class="text-xs text-gray-400">Metas</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl mb-2">📈</div>
+                <p class="text-xs text-gray-400">Progresso</p>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .animate-bounce {
+        animation: bounce 2s infinite;
+    }
+</style>
 {% endblock %}

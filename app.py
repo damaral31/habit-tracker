@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
 from models import db, User, DailyLog, TrainingPlan, Exercise, FoodItem
@@ -101,22 +101,66 @@ def dashboard():
             insights.append(f"A tua média de sono subiu recentemente para {avg_sleep_recent:.1f}h!")
         elif avg_sleep_recent < avg_sleep_past:
             insights.append(f"Atenção: A tua média de sono desceu para {avg_sleep_recent:.1f}h.")
-            
+
     if len(water) >= 3 and all(w >= current_user.goal_water for w in water[-3:]):
         insights.append(f"Excelente! Bebeste {current_user.goal_water}L+ de água consistentemente nos últimos 3 dias.")
-        
+
     if len(calories) > 0:
         avg_cals = sum(calories) / len(calories)
         if avg_cals <= current_user.goal_calories:
             insights.append("Estás dentro da tua meta calórica média!")
         else:
             insights.append("A tua média calórica está acima da meta.")
+
+    # Calculate performance metrics
+    goal_achievements = {
+        'calories': sum(1 for c in calories if 0 < c <= current_user.goal_calories) if calories else 0,
+        'water': sum(1 for w in water if w >= current_user.goal_water) if water else 0,
+        'workout': sum(1 for w in workout if w >= current_user.goal_workout_time) if workout else 0,
+        'sleep': sum(1 for s in sleep if s >= current_user.goal_sleep_hours) if sleep else 0,
+        'reading': sum(1 for r in reading if r >= current_user.goal_reading_pages) if reading else 0
+    }
+
+    total_logs = len(logs) if logs else 1
+    achievement_rates = {
+        'calories': (goal_achievements['calories'] / total_logs * 100) if total_logs > 0 else 0,
+        'water': (goal_achievements['water'] / total_logs * 100) if total_logs > 0 else 0,
+        'workout': (goal_achievements['workout'] / total_logs * 100) if total_logs > 0 else 0,
+        'sleep': (goal_achievements['sleep'] / total_logs * 100) if total_logs > 0 else 0,
+        'reading': (goal_achievements['reading'] / total_logs * 100) if total_logs > 0 else 0
+    }
+
+    # Best performance metrics
+    best_metrics = {}
+    if calories:
+        best_metrics['calories'] = max(calories)
+    if water:
+        best_metrics['water'] = max(water)
+    if workout:
+        best_metrics['workout'] = max(workout)
+    if sleep:
+        best_metrics['sleep'] = max(sleep)
+    if reading:
+        best_metrics['reading'] = max(reading)
+
+    # Weekly comparison (last week vs current week)
+    mid_point = len(logs) // 2
+    first_half = logs[:mid_point]
+    second_half = logs[mid_point:]
+
+    comparison_data = {}
+    if first_half and second_half:
+        first_avg_cals = sum(log.calories_consumed for log in first_half) / len(first_half)
+        second_avg_cals = sum(log.calories_consumed for log in second_half) / len(second_half)
+        comparison_data['calories_trend'] = 'subiu' if second_avg_cals > first_avg_cals else 'desceu'
+        comparison_data['calories_pct'] = abs((second_avg_cals - first_avg_cals) / first_avg_cals * 100) if first_avg_cals > 0 else 0
     
     streak = calculate_streak(current_user.id)
-    return render_template('dashboard.html', streak=streak, dates=dates, calories=calories, water=water, weight=weight, sleep=sleep, 
+    return render_template('dashboard.html', streak=streak, dates=dates, calories=calories, water=water, weight=weight, sleep=sleep,
                            reading=reading, workout=workout,
-                           total_protein=total_protein, total_carbs=total_carbs, total_fats=total_fats, 
-                           filter_days=filter_days, insights=insights)
+                           total_protein=total_protein, total_carbs=total_carbs, total_fats=total_fats,
+                           filter_days=filter_days, insights=insights,
+                           achievement_rates=achievement_rates, best_metrics=best_metrics, comparison_data=comparison_data)
 
 # --- ABA: ALIMENTAÇÃO ---
 @app.route('/alimentacao', methods=['GET', 'POST'])
@@ -151,32 +195,158 @@ def adicionar_alimento():
         food_items = FoodItem.query.filter_by(category=category_filter).all()
     else:
         food_items = FoodItem.query.all()
-        
+
     categories = db.session.query(FoodItem.category).distinct().all()
     categories = [c[0] for c in categories if c[0]]
-    
+
     log_today = get_or_create_log(current_user.id)
 
+    # Inicializar carrinho da sessão se não existir
+    if 'food_cart' not in session:
+        session['food_cart'] = []
+
     if request.method == 'POST':
-        food_id = request.form.get('food_id')
-        grams = float(request.form.get('grams', 0))
-        food = FoodItem.query.get(food_id)
-        if food:
-            cals = int((food.calories_per_100g / 100) * grams)
-            prot = (food.protein_per_100g / 100) * grams
-            carbs = (food.carbs_per_100g / 100) * grams
-            fats = (food.fats_per_100g / 100) * grams
-            
-            log_today.calories_consumed += cals
-            log_today.protein_consumed += prot
-            log_today.carbs_consumed += carbs
-            log_today.fats_consumed += fats
-            
+        action = request.form.get('action')
+
+        if action == 'add_to_cart':
+            food_id = request.form.get('food_id')
+            grams_str = request.form.get('grams', '0')
+
+            try:
+                grams = float(grams_str)
+                if grams <= 0:
+                    flash('Quantidade deve ser maior que 0', 'danger')
+                    return redirect(url_for('adicionar_alimento', category=category_filter))
+
+                food = FoodItem.query.get(food_id)
+                if food:
+                    # Calcular macros
+                    cals = int((food.calories_per_100g / 100) * grams)
+                    prot = round((food.protein_per_100g / 100) * grams, 1)
+                    carbs = round((food.carbs_per_100g / 100) * grams, 1)
+                    fats = round((food.fats_per_100g / 100) * grams, 1)
+
+                    # Adicionar ao carrinho
+                    cart_item = {
+                        'food_id': int(food_id),
+                        'name': food.name,
+                        'grams': grams,
+                        'calories': cals,
+                        'protein': prot,
+                        'carbs': carbs,
+                        'fats': fats
+                    }
+                    session['food_cart'].append(cart_item)
+                    session.modified = True
+                    flash(f'Adicionado {grams}g de {food.name} ao carrinho', 'success')
+            except ValueError:
+                flash('Quantidade inválida', 'danger')
+
+            return redirect(url_for('adicionar_alimento', category=category_filter))
+
+        elif action == 'remove_from_cart':
+            try:
+                index = int(request.form.get('item_index', '-1'))
+                if 0 <= index < len(session['food_cart']):
+                    removed_item = session['food_cart'].pop(index)
+                    session.modified = True
+                    flash(f'Removido {removed_item["name"]} do carrinho', 'info')
+            except (ValueError, IndexError):
+                flash('Erro ao remover item', 'danger')
+
+            return redirect(url_for('adicionar_alimento', category=category_filter))
+
+        elif action == 'clear_cart':
+            session['food_cart'] = []
+            session.modified = True
+            flash('Carrinho limpo', 'info')
+            return redirect(url_for('adicionar_alimento', category=category_filter))
+
+        elif action == 'confirm_meal':
+            if not session['food_cart']:
+                flash('Carrinho vazio. Adicione alimentos para confirmar.', 'warning')
+                return redirect(url_for('adicionar_alimento'))
+
+            # Processar todos os alimentos do carrinho
+            for item in session['food_cart']:
+                log_today.calories_consumed += item['calories']
+                log_today.protein_consumed += item['protein']
+                log_today.carbs_consumed += item['carbs']
+                log_today.fats_consumed += item['fats']
+
             db.session.commit()
-            flash(f'Adicionado {grams}g de {food.name} ({cals} kcal)', 'success')
+
+            # Limpar carrinho após confirmar
+            total_items = len(session['food_cart'])
+            session['food_cart'] = []
+            session.modified = True
+
+            flash(f'Refeição confirmada! {total_items} alimento(s) adicionado(s)', 'success')
             return redirect(url_for('alimentacao'))
 
-    return render_template('adicionar_alimento.html', food_items=food_items, categories=categories, current_category=category_filter)
+    # Calcular totais do carrinho
+    cart_totals = {
+        'calories': sum(item['calories'] for item in session['food_cart']),
+        'protein': round(sum(item['protein'] for item in session['food_cart']), 1),
+        'carbs': round(sum(item['carbs'] for item in session['food_cart']), 1),
+        'fats': round(sum(item['fats'] for item in session['food_cart']), 1)
+    }
+
+    return render_template('adicionar_alimento.html',
+                         food_items=food_items,
+                         categories=categories,
+                         current_category=category_filter,
+                         food_cart=session['food_cart'],
+                         cart_totals=cart_totals)
+
+@app.route('/gerenciar_alimentos', methods=['GET', 'POST'])
+@login_required
+def gerenciar_alimentos():
+    food_items = FoodItem.query.all()
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'add_food':
+            name = request.form.get('name')
+            calories = int(request.form.get('calories_per_100g', 0))
+            protein = float(request.form.get('protein_per_100g', 0))
+            carbs = float(request.form.get('carbs_per_100g', 0))
+            fats = float(request.form.get('fats_per_100g', 0))
+            category = request.form.get('category')
+
+            if not name or not calories:
+                flash('Nome e calorias são obrigatórios.', 'danger')
+            else:
+                existing = FoodItem.query.filter_by(name=name).first()
+                if existing:
+                    flash('Este alimento já existe.', 'danger')
+                else:
+                    new_food = FoodItem(
+                        name=name,
+                        calories_per_100g=calories,
+                        protein_per_100g=protein,
+                        carbs_per_100g=carbs,
+                        fats_per_100g=fats,
+                        category=category
+                    )
+                    db.session.add(new_food)
+                    db.session.commit()
+                    flash(f'Alimento "{name}" adicionado com sucesso!', 'success')
+                    return redirect(url_for('gerenciar_alimentos'))
+        elif action == 'delete_food':
+            food_id = request.form.get('food_id')
+            food = FoodItem.query.get(food_id)
+            if food:
+                food_name = food.name
+                db.session.delete(food)
+                db.session.commit()
+                flash(f'Alimento "{food_name}" removido com sucesso!', 'success')
+            return redirect(url_for('gerenciar_alimentos'))
+
+    categories = db.session.query(FoodItem.category).distinct().all()
+    categories = [c[0] for c in categories if c[0]]
+
+    return render_template('gerenciar_alimentos.html', food_items=food_items, categories=categories)
 
 # --- ABA: TREINO ---
 @app.route('/treino', methods=['GET', 'POST'])

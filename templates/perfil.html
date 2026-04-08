@@ -1,115 +1,189 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Perfil - Healthy Habit Tracker{% endblock %}
 
 {% block content %}
 <div class="space-y-8">
-    <!-- Informações do Utilizador -->
-    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-200 mb-4"> Meu Perfil</h2>
-        <p class="text-lg text-gray-400">Utilizador: <strong class="text-white">{{ current_user.username }}</strong></p>
+    <!-- Cabeçalho do Perfil -->
+    <div class="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-900 p-8 rounded-xl shadow-2xl border border-purple-500/30">
+        <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-4xl">👤</div>
+            <div>
+                <h2 class="text-3xl font-bold text-white">{{ current_user.username }}</h2>
+                <p class="text-purple-100">Meu Perfil Pessoal</p>
+            </div>
+        </div>
     </div>
 
     <!-- Definir Metas -->
-    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-        <h3 class="text-xl font-bold text-gray-200 mb-6"> Minhas Metas Diárias</h3>
+    <div class="bg-gradient-to-br from-gray-800/80 to-gray-900/50 border border-gray-700 p-8 rounded-xl shadow-xl">
+        <h3 class="text-2xl font-bold text-white mb-8">🎯 Minhas Metas Diárias</h3>
         <form method="POST" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Meta de Calorias -->
-                <div>
-                    <label for="goal_calories" class="block text-sm font-medium text-gray-400"> Meta de Calorias (kcal/dia)</label>
-                    <input type="number" id="goal_calories" name="goal_calories" value="{{ current_user.goal_calories }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 2000">
-                    <p class="text-sm text-gray-500 mt-1">Recomendação: 1800-2500 kcal</p>
+                <div class="bg-blue-900/20 p-6 rounded-lg border border-blue-600/40 hover:border-blue-600/60 transition">
+                    <label for="goal_calories" class="block text-sm font-semibold text-blue-300 mb-3">🔥 Meta de Calorias</label>
+                    <input type="number" id="goal_calories" name="goal_calories" value="{{ current_user.goal_calories }}" required class="w-full px-4 py-3 bg-blue-900/30 border border-blue-600/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="ex: 2000">
+                    <p class="text-xs text-gray-400 mt-2">Recomendação: 1800-2500 kcal/dia</p>
                 </div>
 
                 <!-- Meta de Água -->
-                <div>
-                    <label for="goal_water" class="block text-sm font-medium text-gray-400"> Meta de Água (litros/dia)</label>
-                    <input type="number" id="goal_water" name="goal_water" step="0.1" value="{{ current_user.goal_water }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 2.0">
-                    <p class="text-sm text-gray-500 mt-1">Recomendação: 2.0-3.0 litros</p>
+                <div class="bg-cyan-900/20 p-6 rounded-lg border border-cyan-600/40 hover:border-cyan-600/60 transition">
+                    <label for="goal_water" class="block text-sm font-semibold text-cyan-300 mb-3">💧 Meta de Água</label>
+                    <input type="number" id="goal_water" name="goal_water" step="0.1" value="{{ current_user.goal_water }}" required class="w-full px-4 py-3 bg-cyan-900/30 border border-cyan-600/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="ex: 2.0">
+                    <p class="text-xs text-gray-400 mt-2">Recomendação: 2.0-3.0 L/dia</p>
                 </div>
 
                 <!-- Meta de Peso -->
-                <div>
-                    <label for="goal_weight" class="block text-sm font-medium text-gray-400"> Peso Alvo (kg)</label>
-                    <input type="number" id="goal_weight" name="goal_weight" step="0.1" value="{{ current_user.goal_weight }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 70.0">
-                    <p class="text-sm text-gray-500 mt-1">Defina o seu peso ideal</p>
+                <div class="bg-red-900/20 p-6 rounded-lg border border-red-600/40 hover:border-red-600/60 transition">
+                    <label for="goal_weight" class="block text-sm font-semibold text-red-300 mb-3">⚖️ Peso Alvo</label>
+                    <input type="number" id="goal_weight" name="goal_weight" step="0.1" value="{{ current_user.goal_weight }}" required class="w-full px-4 py-3 bg-red-900/30 border border-red-600/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="ex: 70.0">
+                    <p class="text-xs text-gray-400 mt-2">Seu peso ideal em kg</p>
                 </div>
 
-                <!-- Meta de Tempo de Treino -->
-                <div>
-                    <label for="goal_workout_time" class="block text-sm font-medium text-gray-400"> Tempo de Treino (minutos/dia)</label>
-                    <input type="number" id="goal_workout_time" name="goal_workout_time" value="{{ current_user.goal_workout_time }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 30">
-                    <p class="text-sm text-gray-500 mt-1">Recomendação: 30-60 minutos</p>
+                <!-- Meta de Treino -->
+                <div class="bg-green-900/20 p-6 rounded-lg border border-green-600/40 hover:border-green-600/60 transition">
+                    <label for="goal_workout_time" class="block text-sm font-semibold text-green-300 mb-3">💪 Tempo de Treino</label>
+                    <input type="number" id="goal_workout_time" name="goal_workout_time" value="{{ current_user.goal_workout_time }}" required class="w-full px-4 py-3 bg-green-900/30 border border-green-600/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 30">
+                    <p class="text-xs text-gray-400 mt-2">Recomendação: 30-60 min/dia</p>
                 </div>
+
                 <!-- Meta de Sono -->
-                <div>
-                    <label for="goal_sleep_hours" class="block text-sm font-medium text-gray-400">😴 Horas de Sono (horas/noite)</label>
-                    <input type="number" id="goal_sleep_hours" name="goal_sleep_hours" step="0.1" value="{{ current_user.goal_sleep_hours }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 8.0">
-                    <p class="text-sm text-gray-500 mt-1">Recomendação: 7-9 horas</p>
+                <div class="bg-purple-900/20 p-6 rounded-lg border border-purple-600/40 hover:border-purple-600/60 transition">
+                    <label for="goal_sleep_hours" class="block text-sm font-semibold text-purple-300 mb-3">😴 Horas de Sono</label>
+                    <input type="number" id="goal_sleep_hours" name="goal_sleep_hours" step="0.1" value="{{ current_user.goal_sleep_hours }}" required class="w-full px-4 py-3 bg-purple-900/30 border border-purple-600/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="ex: 8.0">
+                    <p class="text-xs text-gray-400 mt-2">Recomendação: 7-9 h/noite</p>
                 </div>
 
                 <!-- Meta de Leitura -->
-                <div>
-                    <label for="goal_reading_pages" class="block text-sm font-medium text-gray-400">📚 Páginas Lidas (páginas/dia)</label>
-                    <input type="number" id="goal_reading_pages" name="goal_reading_pages" value="{{ current_user.goal_reading_pages }}" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="ex: 20">
-                    <p class="text-sm text-gray-500 mt-1">Recomendação: 10-30 páginas</p>
+                <div class="bg-indigo-900/20 p-6 rounded-lg border border-indigo-600/40 hover:border-indigo-600/60 transition">
+                    <label for="goal_reading_pages" class="block text-sm font-semibold text-indigo-300 mb-3">📚 Páginas de Leitura</label>
+                    <input type="number" id="goal_reading_pages" name="goal_reading_pages" value="{{ current_user.goal_reading_pages }}" required class="w-full px-4 py-3 bg-indigo-900/30 border border-indigo-600/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="ex: 20">
+                    <p class="text-xs text-gray-400 mt-2">Recomendação: 10-30 pág/dia</p>
                 </div>
             </div>
 
-            <button type="submit" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors">
-                Guardar Metas
+            <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 px-8 rounded-lg transition-all transform hover:scale-105 shadow-lg text-lg">
+                ✅ Guardar Todas as Metas
             </button>
         </form>
     </div>
 
-    <!-- Recomendações de Saúde -->
+    <!-- Dicas Nutritivas -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Nutrição -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h4 class="text-lg font-bold text-blue-400 mb-3"> Dicas de Nutrição</h4>
-            <ul class="space-y-2 text-gray-400 text-sm">
-                <li> Consuma proteína em cada refeição</li>
-                <li> Beba água regularmente ao longo do dia</li>
-                <li> Evite alimentos ultraprocessados</li>
-                <li> Coma devagar e mastigue bem</li>
-                <li> Faça 3 refeições principais + 1-2 lanches</li>
+        <div class="bg-gradient-to-br from-blue-900/30 to-blue-800/10 p-8 rounded-xl shadow-lg border border-blue-600/40 hover:from-blue-900/40 hover:to-blue-800/20 transition">
+            <h4 class="text-xl font-bold text-blue-400 mb-6 flex items-center">
+                <span class="text-2xl mr-3">🍎</span> Dicas de Nutrição
+            </h4>
+            <ul class="space-y-4 text-gray-400 text-sm">
+                <li class="flex items-start">
+                    <span class="text-blue-400 mr-3 font-bold">•</span>
+                    <span>Consuma proteína em cada refeição (frango, peixe, ovos, legumes)</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-blue-400 mr-3 font-bold">•</span>
+                    <span>Beba água regularmente ao longo do dia</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-blue-400 mr-3 font-bold">•</span>
+                    <span>Evite alimentos ultraprocessados e açúcares refinados</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-blue-400 mr-3 font-bold">•</span>
+                    <span>Coma devagar e mastigue bem os alimentos</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-blue-400 mr-3 font-bold">•</span>
+                    <span>Faça 3 refeições principais + 1-2 lanches saudáveis</span>
+                </li>
             </ul>
         </div>
 
         <!-- Exercício -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h4 class="text-lg font-bold text-green-400 mb-3"> Dicas de Exercício</h4>
-            <ul class="space-y-2 text-gray-400 text-sm">
-                <li> Combine cardio com treino de força</li>
-                <li> Faça aquecimento antes de treinar</li>
-                <li> Descanse 1-2 dias por semana</li>
-                <li> Aumente a intensidade gradualmente</li>
-                <li> Mantenha a consistência</li>
+        <div class="bg-gradient-to-br from-green-900/30 to-green-800/10 p-8 rounded-xl shadow-lg border border-green-600/40 hover:from-green-900/40 hover:to-green-800/20 transition">
+            <h4 class="text-xl font-bold text-green-400 mb-6 flex items-center">
+                <span class="text-2xl mr-3">💪</span> Dicas de Exercício
+            </h4>
+            <ul class="space-y-4 text-gray-400 text-sm">
+                <li class="flex items-start">
+                    <span class="text-green-400 mr-3 font-bold">•</span>
+                    <span>Combine cardio com treino de força para máximos resultados</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-green-400 mr-3 font-bold">•</span>
+                    <span>Faça aquecimento de 5-10 min antes de treinar</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-green-400 mr-3 font-bold">•</span>
+                    <span>Descanse 1-2 dias por semana para recuperação</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-green-400 mr-3 font-bold">•</span>
+                    <span>Aumente a intensidade gradualmente para evitar lesões</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-green-400 mr-3 font-bold">•</span>
+                    <span>Mantenha a consistência - é a chave do sucesso</span>
+                </li>
             </ul>
         </div>
 
         <!-- Sono -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h4 class="text-lg font-bold text-purple-400 mb-3"> Dicas de Sono</h4>
-            <ul class="space-y-2 text-gray-400 text-sm">
-                <li> Durma 7-9 horas por noite</li>
-                <li> Mantenha um horário regular</li>
-                <li> Evite ecrãs 1 hora antes de dormir</li>
-                <li> Mantenha o quarto fresco e escuro</li>
-                <li> Evite cafeína após as 15h</li>
+        <div class="bg-gradient-to-br from-purple-900/30 to-purple-800/10 p-8 rounded-xl shadow-lg border border-purple-600/40 hover:from-purple-900/40 hover:to-purple-800/20 transition">
+            <h4 class="text-xl font-bold text-purple-400 mb-6 flex items-center">
+                <span class="text-2xl mr-3">😴</span> Dicas de Sono
+            </h4>
+            <ul class="space-y-4 text-gray-400 text-sm">
+                <li class="flex items-start">
+                    <span class="text-purple-400 mr-3 font-bold">•</span>
+                    <span>Durma 7-9 horas por noite para recuperação adequada</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-purple-400 mr-3 font-bold">•</span>
+                    <span>Mantenha um horário regular - durma e acorde na mesma hora</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-purple-400 mr-3 font-bold">•</span>
+                    <span>Evite ecrãs (telemóvel, TV, PC) 1 hora antes de dormir</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-purple-400 mr-3 font-bold">•</span>
+                    <span>Mantenha o quarto fresco, escuro e silencioso</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-purple-400 mr-3 font-bold">•</span>
+                    <span>Evite cafeína após as 15h - prejudica a qualidade do sono</span>
+                </li>
             </ul>
         </div>
 
         <!-- Bem-estar Mental -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h4 class="text-lg font-bold text-pink-400 mb-3"> Bem-estar Mental</h4>
-            <ul class="space-y-2 text-gray-400 text-sm">
-                <li> Pratique meditação diariamente</li>
-                <li> Passe tempo ao ar livre</li>
-                <li> Mantenha contacto social</li>
-                <li> Leia regularmente</li>
-                <li> Gerencie o stress com técnicas de relaxamento</li>
+        <div class="bg-gradient-to-br from-pink-900/30 to-pink-800/10 p-8 rounded-xl shadow-lg border border-pink-600/40 hover:from-pink-900/40 hover:to-pink-800/20 transition">
+            <h4 class="text-xl font-bold text-pink-400 mb-6 flex items-center">
+                <span class="text-2xl mr-3">🧘</span> Bem-estar Mental
+            </h4>
+            <ul class="space-y-4 text-gray-400 text-sm">
+                <li class="flex items-start">
+                    <span class="text-pink-400 mr-3 font-bold">•</span>
+                    <span>Pratique meditação 10-15 minutos diariamente</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-pink-400 mr-3 font-bold">•</span>
+                    <span>Passe tempo ao ar livre - contacto com natureza reduz stress</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-pink-400 mr-3 font-bold">•</span>
+                    <span>Mantenha contacto social frequente com amigos e família</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-pink-400 mr-3 font-bold">•</span>
+                    <span>Leia regularmente para expandir conhecimento e relaxar</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="text-pink-400 mr-3 font-bold">•</span>
+                    <span>Gerencie o stress com técnicas de respiração e relaxamento</span>
+                </li>
             </ul>
         </div>
     </div>
